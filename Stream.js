@@ -22,7 +22,8 @@ class Streamlink extends EventEmitter {
     isLive(done) {
         exec('streamlink -j ' + this.stream, (err, stdout, stderr) => {
             var json = JSON.parse(stdout);
-            if (json.error);
+            if (json.error)
+                done(false);
             else {
                 this.qualities = Object.keys(json['streams']);
                 done(true);
