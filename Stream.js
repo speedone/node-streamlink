@@ -7,6 +7,8 @@ class Streamlink extends EventEmitter {
     constructor(stream) {
         super();
         this.stream = stream;
+        this.title = null;
+        this.author = null;
     }
 
     output(loc) {
@@ -52,7 +54,17 @@ class Streamlink extends EventEmitter {
 
             this.live = spawn('streamlink', args);
             this.live.stdout.on('data', (d) => {
-                this.emit('log', d.toString());
+                var line = d.toString();
+                this.emit('log', line);
+
+                if (line.indexOf('Author:') > -1) {
+                    this.author = line.substring(31);
+                    this.emit('author', this.author);
+                }
+                if (line.indexOf('Title:') > -1) {
+                    this.title = line.substring(31);
+                    this.emit('title', this.title);
+                }
             });
 
             this.live.on('close', (code, st) => this.end(code, st));
